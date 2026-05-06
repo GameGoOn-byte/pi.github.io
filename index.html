@@ -16,7 +16,6 @@
 </head>
 <body>
 
-<h2>π Generator</h2>
 <div id="output"></div>
 
 <script>
@@ -50,24 +49,26 @@ function* piGenerator() {
     }
 }
 
-const output = document.getElementById("output");
 const pi = piGenerator();
 
 let i = 0;
 let lastDigit = null;
 
-// API storage
+// shared API value (always updated)
 window.currentSeed = null;
 
-// update seed globally
 function updateSeed(digit) {
     lastDigit = digit;
-    window.currentSeed = digit;
+    window.currentSeed = digit.toString();
 }
 
-// API mode (when visiting ?api)
-if (window.location.search === "?api") {
-    document.body.innerText = "Loading seed...";
+// API mode flag
+const isAPI = window.location.search === "?api";
+
+// API endpoint mode
+if (isAPI) {
+    document.body.innerText = "API running...";
+
     setInterval(() => {
         document.body.innerText = JSON.stringify({
             seed: window.currentSeed
@@ -75,29 +76,29 @@ if (window.location.search === "?api") {
     }, 200);
 }
 
-// normal π rendering
-function printDigits() {
+// ALWAYS run generator (this fixes null issue)
+function runGenerator() {
     for (let j = 0; j < 50; j++) {
         let digit = pi.next().value;
 
         updateSeed(digit);
 
-        if (i === 0) {
-            output.textContent += digit + ".";
-        } else {
-            output.textContent += digit;
+        if (!isAPI) {
+            if (i === 0) {
+                document.getElementById("output").textContent += digit + ".";
+            } else {
+                document.getElementById("output").textContent += digit;
+            }
         }
 
         i++;
     }
 
-    requestAnimationFrame(printDigits);
+    requestAnimationFrame(runGenerator);
 }
 
-// only run visual mode if NOT in API mode
-if (window.location.search !== "?api") {
-    printDigits();
-}
+// start everything
+runGenerator();
 </script>
 
 </body>
