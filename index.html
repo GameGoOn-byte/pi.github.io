@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Infinite Pi Generator</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #111;
+            color: #0f0;
+            padding: 20px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+<h2>π Generator</h2>
+<div id="output"></div>
+
+<script>
+function* piGenerator() {
+    let q = 1n, r = 0n, t = 1n, k = 1n, n = 3n, l = 3n;
+
+    while (true) {
+        if (4n*q + r - t < n*t) {
+            yield n;
+            let q2 = 10n*q;
+            let r2 = 10n*(r - n*t);
+            let n2 = (10n*(3n*q + r)) / t - 10n*n;
+            q = q2;
+            r = r2;
+            n = n2;
+        } else {
+            let q2 = q*k;
+            let r2 = (2n*q + r)*l;
+            let t2 = t*l;
+            let k2 = k + 1n;
+            let n2 = (q*(7n*k + 2n) + r*l) / (t*l);
+            let l2 = l + 2n;
+
+            q = q2;
+            r = r2;
+            t = t2;
+            k = k2;
+            n = n2;
+            l = l2;
+        }
+    }
+}
+
+const output = document.getElementById("output");
+const pi = piGenerator();
+
+let i = 0;
+let lastDigit = null; // stored but NOT displayed
+
+function printDigits() {
+    for (let j = 0; j < 50; j++) {
+        let digit = pi.next().value;
+
+        lastDigit = digit; // update variable silently
+
+        if (i === 0) {
+            output.textContent += digit + ".";
+        } else {
+            output.textContent += digit;
+        }
+
+        i++;
+    }
+
+    requestAnimationFrame(printDigits);
+}
+
+printDigits();
+</script>
+
+</body>
+</html>
