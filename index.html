@@ -54,13 +54,33 @@ const output = document.getElementById("output");
 const pi = piGenerator();
 
 let i = 0;
-let lastDigit = null; // stored but NOT displayed
+let lastDigit = null;
 
+// API storage
+window.currentSeed = null;
+
+// update seed globally
+function updateSeed(digit) {
+    lastDigit = digit;
+    window.currentSeed = digit;
+}
+
+// API mode (when visiting ?api)
+if (window.location.search === "?api") {
+    document.body.innerText = "Loading seed...";
+    setInterval(() => {
+        document.body.innerText = JSON.stringify({
+            seed: window.currentSeed
+        });
+    }, 200);
+}
+
+// normal π rendering
 function printDigits() {
     for (let j = 0; j < 50; j++) {
         let digit = pi.next().value;
 
-        lastDigit = digit; // update variable silently
+        updateSeed(digit);
 
         if (i === 0) {
             output.textContent += digit + ".";
@@ -74,7 +94,10 @@ function printDigits() {
     requestAnimationFrame(printDigits);
 }
 
-printDigits();
+// only run visual mode if NOT in API mode
+if (window.location.search !== "?api") {
+    printDigits();
+}
 </script>
 
 </body>
